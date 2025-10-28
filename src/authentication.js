@@ -5,9 +5,10 @@
 // Contains reusable Firebase Authentication functions
 // (login, signup, logout, and auth state checks).
 // -------------------------------------------------------------
-
+import { db } from "/src/firebaseConfig.js"
+import { doc, setDoc } from "firebase/firestore"
 // Import the initialized Firebase Authentication object
-import { auth } from "/src/firebaseConfig.js";
+import { auth } from "/src/firebaseConfig.js"
 
 // Import specific functions from the Firebase Auth SDK
 import {
@@ -16,7 +17,7 @@ import {
   updateProfile,
   onAuthStateChanged,
   signOut,
-} from "firebase/auth";
+} from "firebase/auth"
 
 // -------------------------------------------------------------
 // loginUser(email, password)
@@ -32,7 +33,7 @@ import {
 //   await loginUser("user@example.com", "password123");
 // -------------------------------------------------------------
 export async function loginUser(email, password) {
-  return signInWithEmailAndPassword(auth, email, password);
+  return signInWithEmailAndPassword(auth, email, password)
 }
 
 // -------------------------------------------------------------
@@ -51,9 +52,27 @@ export async function loginUser(email, password) {
 //   const user = await signupUser("Alice", "alice@email.com", "secret");
 // -------------------------------------------------------------
 export async function signupUser(name, email, password) {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(userCredential.user, { displayName: name });
-  return userCredential.user;
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  )
+  const user = userCredential.user // Get the user object
+  await updateProfile(user, { displayName: name })
+
+  try {
+    await setDoc(doc(db, "users", user.uid), {
+      name: name,
+      email: email,
+      country: "Canada", // Default value
+      school: "BCIT", // Default value
+    })
+    console.log("Firestore user document created successfully!")
+  } catch (error) {
+    console.error("Error creating user document in Firestore:", error)
+  }
+
+  return user
 }
 
 // -------------------------------------------------------------
@@ -66,8 +85,8 @@ export async function signupUser(name, email, password) {
 //   await logoutUser();
 // -------------------------------------------------------------
 export async function logoutUser() {
-  await signOut(auth);
-  window.location.href = "index.html";
+  await signOut(auth)
+  window.location.href = "index.html"
 }
 
 // -------------------------------------------------------------
@@ -89,13 +108,13 @@ export function checkAuthState() {
   onAuthStateChanged(auth, (user) => {
     if (window.location.pathname.endsWith("main.html")) {
       if (user) {
-        const displayName = user.displayName || user.email;
-        $("#welcomeMessage").text(`Hello, ${displayName}!`);
+        const displayName = user.displayName || user.email
+        $("#welcomeMessage").text(`Hello, ${displayName}!`)
       } else {
-        window.location.href = "index.html";
+        window.location.href = "index.html"
       }
     }
-  });
+  })
 }
 
 // -------------------------------------------------------------
@@ -105,7 +124,7 @@ export function checkAuthState() {
 // Runs the given callback(user) when Firebase resolves or changes auth state.
 // Useful for showing user info or redirecting after login/logout.
 export function onAuthReady(callback) {
-  return onAuthStateChanged(auth, callback);
+  return onAuthStateChanged(auth, callback)
 }
 
 // -------------------------------------------------------------
@@ -114,7 +133,7 @@ export function onAuthReady(callback) {
 // Maps Firebase Auth error codes to short, user-friendly messages.
 // Helps display clean error alerts instead of raw Firebase codes.
 export function authErrorMessage(error) {
-  const code = (error?.code || "").toLowerCase();
+  const code = (error?.code || "").toLowerCase()
 
   const map = {
     "auth/invalid-credential": "Wrong email or password.",
@@ -126,8 +145,7 @@ export function authErrorMessage(error) {
     "auth/weak-password": "Password too weak (min 6 characters).",
     "auth/missing-password": "Password cannot be empty.",
     "auth/network-request-failed": "Network error. Try again.",
-  };
+  }
 
-  return map[code] || "Something went wrong. Please try again.";
+  return map[code] || "Something went wrong. Please try again."
 }
-

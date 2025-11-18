@@ -9,9 +9,9 @@
 // ---------------------------------------------------------
 
 // Import Firebase SDK modules (using Firebase v9 modular syntax)
-import { getFirestore } from "firebase/firestore"
-import { initializeApp } from "firebase/app"
-import { getAuth } from "firebase/auth"
+import { getFirestore } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 // ---------------------------------------------------------
 // Read Firebase configuration from Vite environment variables.
@@ -29,18 +29,18 @@ const firebaseConfig = {
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
-}
+};
 
 // ---------------------------------------------------------
 // Initialize the Firebase app instance.
 // This sets up the Firebase connection for your web app.
 // ---------------------------------------------------------
-const app = initializeApp(firebaseConfig)
+const app = initializeApp(firebaseConfig);
 
 // ---------------------------------------------------------
 // Create and export the Firebase Authentication service.
 // You can import "auth" anywhere to perform login, signup,
 // or signout operations (that's why we export it).
 // ---------------------------------------------------------
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+export const auth = getAuth(app);
+export const db = getFirestore(app);
